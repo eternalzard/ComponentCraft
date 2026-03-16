@@ -5,7 +5,7 @@
   "main": "code.js",
   "ui": "ui.html",
   "documentAccess": "dynamic-page",
- "networkAccess": { "allowedDomains": ["none"] },
+  "networkAccess": { "allowedDomains": ["none"] },
   "capabilities": [],
   "enableProposedApi": false,
   "editorType": [

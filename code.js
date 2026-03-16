@@ -3,7 +3,14 @@ figma.showUI(__html__, { width: 400, height: 600 });
 
 // 监听来自UI的消息
 figma.ui.onmessage = async (msg) => {
-  if (msg.type === 'create-component') {
+  if (msg.type === 'save-prefix') {
+    // 保存前缀到Figma客户端存储
+    await figma.clientStorage.setAsync('componentPrefix', msg.prefix);
+  } else if (msg.type === 'load-prefix') {
+    // 从Figma客户端存储加载前缀
+    const prefix = await figma.clientStorage.getAsync('componentPrefix');
+    figma.ui.postMessage({ type: 'loaded-prefix', prefix: prefix || '' });
+  } else if (msg.type === 'create-component') {
     try {
       const { imageData, name, description } = msg;
 

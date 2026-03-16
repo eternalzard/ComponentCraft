@@ -212,7 +212,7 @@
 </head>
 <body>
   <div class="container">
-    <h1>ComponentCraft</h1>
+    <h1>ComponentCraft <span style="font-size: 12px; color: #999;">v1.1</span></h1>
     
     <div class="form-group">
       <label for="image-upload">选择PNG图片 (最多5张):</label>
@@ -220,6 +220,18 @@
         <button class="file-input-button" id="upload-button">选择图片</button>
         <input type="file" id="image-upload" accept=".png" multiple>
       </div>
+    </div>
+    
+    <div class="form-group" id="prefix-controls" style="display: none;">
+      <label style="display: flex; align-items: center;">
+        <input type="checkbox" id="prefix-toggle" style="margin-right: 8px; accent-color: #18a0fb;">
+        启用组件名称前缀
+      </label>
+    </div>
+    
+    <div class="form-group" id="prefix-group" style="display: none;">
+      <label for="prefix-input">组件名称前缀:</label>
+      <input type="text" id="prefix-input" placeholder="例如: Button_">
     </div>
     
     <div class="image-count" id="image-count">已选择: 0/5 张图片</div>
@@ -244,9 +256,23 @@
     const imageCount = document.getElementById('image-count');
     const submitButton = document.getElementById('submit-button');
     const messageContainer = document.getElementById('message-container');
+    const prefixToggle = document.getElementById('prefix-toggle');
+    const prefixGroup = document.getElementById('prefix-group');
+    const prefixInput = document.getElementById('prefix-input');
     
     let images = [];
     const MAX_IMAGES = 5;
+    
+    // 监听前缀开关
+    prefixToggle.addEventListener('change', function() {
+      if (this.checked) {
+        prefixGroup.style.display = 'block';
+        // 请求加载上一次的默认前缀
+        parent.postMessage({ pluginMessage: { type: 'load-prefix' } }, '*');
+      } else {
+        prefixGroup.style.display = 'none';
+      }
+    });
     
     // 监听文件选择
     imageUpload.addEventListener('change', function(e) {
@@ -274,6 +300,11 @@
             renderImageList();
             updateImageCount();
             checkFormValidity();
+            
+            // 如果有图片，显示前缀控件
+            if (images.length > 0) {
+              document.getElementById('prefix-controls').style.display = 'block';
+            }
           };
           reader.readAsDataURL(file);
         } else {
@@ -319,6 +350,13 @@
           renderImageList();
           updateImageCount();
           checkFormValidity();
+          
+          // 如果没有图片了，隐藏前缀控件
+          if (images.length === 0) {
+            document.getElementById('prefix-controls').style.display = 'none';
+            prefixGroup.style.display = 'none';
+            prefixToggle.checked = false;
+          }
         });
       });
       
@@ -395,13 +433,24 @@
         // 处理所有图片
         const imageDataArray = [];
         
+        // 获取前缀（如果启用）
+        const prefix = prefixToggle.checked ? prefixInput.value.trim() : '';
+        
+        // 保存前缀到Figma存储（如果启用了前缀功能）
+        if (prefixToggle.checked && prefix) {
+          parent.postMessage({ pluginMessage: { type: 'save-prefix', prefix: prefix } }, '*');
+        }
+        
         for (const image of images) {
           const arrayBuffer = await image.file.arrayBuffer();
           const imageData = new Uint8Array(arrayBuffer);
           
+          // 应用前缀到组件名称
+          const finalName = prefix ? prefix + image.name.trim() : image.name.trim();
+          
           imageDataArray.push({
             imageData: Array.from(imageData),
-            name: image.name.trim(),
+            name: finalName,
             description: image.description.trim()
           });
         }
@@ -432,6 +481,11 @@
         showMessage(message.message, 'error');
         submitButton.disabled = false;
         submitButton.textContent = '创建组件';
+      } else if (message.type === 'loaded-prefix') {
+        // 加载上一次的默认前缀
+        if (message.prefix) {
+          prefixInput.value = message.prefix;
+        }
       }
     };
     
@@ -442,6 +496,12 @@
       updateImageCount();
       checkFormValidity();
       messageContainer.innerHTML = '';
+      
+      // 隐藏前缀控件
+      document.getElementById('prefix-controls').style.display = 'none';
+      prefixGroup.style.display = 'none';
+      prefixToggle.checked = false;
+      prefixInput.value = '';
       
       // 隐藏提交按钮，只保留选择图片按钮
       submitButton.style.display = 'none';
