@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>ComponentCraft</title>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f5f5f5;
+    }
+    
+    .container {
+      max-width: 360px;
+      margin: 0 auto;
+    }
+    
+    h1 {
+      font-size: 18px;
+      margin-bottom: 20px;
+      color: #333;
+    }
+    
+    .form-group {
+      margin-bottom: 15px;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 500;
+      font-size: 14px;
+      color: #555;
+    }
+    
+    input[type="text"], textarea {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 14px;
+      box-sizing: border-box;
+      outline: none;
+    }
+    
+    input[type="text"]:focus, textarea:focus {
+      border-color: #18a0fb;
+      box-shadow: 0 0 0 2px rgba(24, 160, 251, 0.2);
+    }
+    
+    textarea {
+      height: 80px;
+      resize: vertical;
+    }
+    
+    .file-input-container {
+      position: relative;
+      overflow: hidden;
+      display: inline-block;
+      width: 100%;
+    }
+    
+    .file-input-button {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      background-color: #18a0fb;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      text-align: center;
+      font-size: 14px;
+    }
+    
+    .file-input-button:hover {
+      background-color: #0d8aee;
+    }
+    
+    input[type="file"] {
+      position: absolute;
+      left: 0;
+      top: 0;
+      opacity: 0;
+      width: 100%;
+      height: 100%;
+      cursor: pointer;
+    }
+    
+    .preview-container {
+      margin: 15px 0;
+      text-align: center;
+    }
+    
+    .image-preview {
+      max-width: 100%;
+      max-height: 200px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    
+    .submit-button {
+      width: 100%;
+      padding: 12px;
+      background-color: #18a0fb;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 500;
+    }
+    
+    .submit-button:hover {
+      background-color: #0d8aee;
+    }
+    
+    .submit-button:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
+    
+    .message {
+      margin-top: 15px;
+      padding: 10px;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+    
+    .success {
+      background-color: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+    
+    .error {
+      background-color: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+    
+    /* 新增样式 */
+    .image-list {
+      margin-top: 20px;
+    }
+    
+    .image-item {
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 15px;
+      margin-bottom: 15px;
+      background-color: white;
+      position: relative;
+    }
+    
+    .image-item-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    
+    .image-item-title {
+      font-weight: 500;
+      font-size: 14px;
+    }
+    
+    .delete-button {
+      background-color: #ff4757;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      padding: 5px 10px;
+      cursor: pointer;
+      font-size: 12px;
+    }
+    
+    .delete-button:hover {
+      background-color: #ff3742;
+    }
+    
+    .image-thumbnail {
+      max-width: 100%;
+      max-height: 150px;
+      border: 1px solid #eee;
+      border-radius: 4px;
+      margin-bottom: 10px;
+    }
+    
+    .image-count {
+      font-size: 14px;
+      color: #666;
+      margin: 10px 0;
+    }
+    
+    .add-more-button {
+      background-color: #f1f2f6;
+      color: #333;
+      border: 1px dashed #ddd;
+      border-radius: 4px;
+      padding: 15px;
+      text-align: center;
+      cursor: pointer;
+      margin-bottom: 15px;
+    }
+    
+    .add-more-button:hover {
+      background-color: #e9eaec;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>ComponentCraft</h1>
+    
+    <div class="form-group">
+      <label for="image-upload">选择PNG图片 (最多5张):</label>
+      <div class="file-input-container">
+        <button class="file-input-button" id="upload-button">选择图片</button>
+        <input type="file" id="image-upload" accept=".png" multiple>
+      </div>
+    </div>
+    
+    <div class="image-count" id="image-count">已选择: 0/5 张图片</div>
+    
+    <div style="font-size: 12px; color: #666; margin-bottom: 10px;">
+      提示：组件名称为必填项，描述为选填项
+    </div>
+    
+    <div class="image-list" id="image-list">
+      <!-- 图片列表将在这里动态生成 -->
+    </div>
+    
+    <button id="submit-button" class="submit-button" disabled style="display: none;">创建组件</button>
+    
+    <div id="message-container"></div>
+  </div>
+
+  <script>
+    const imageUpload = document.getElementById('image-upload');
+    const uploadButton = document.getElementById('upload-button');
+    const imageList = document.getElementById('image-list');
+    const imageCount = document.getElementById('image-count');
+    const submitButton = document.getElementById('submit-button');
+    const messageContainer = document.getElementById('message-container');
+    
+    let images = [];
+    const MAX_IMAGES = 5;
+    
+    // 监听文件选择
+    imageUpload.addEventListener('change', function(e) {
+      const files = Array.from(e.target.files);
+      
+      // 检查是否超过最大数量
+      if (images.length + files.length > MAX_IMAGES) {
+        showMessage(`最多只能上传 ${MAX_IMAGES} 张图片`, 'error');
+        return;
+      }
+      
+      // 处理每个文件
+      files.forEach(file => {
+        if (file && file.type === 'image/png') {
+          const reader = new FileReader();
+          reader.onload = function(event) {
+            const imageData = {
+              file: file,
+              name: '',
+              description: '',
+              preview: event.target.result
+            };
+            
+            images.push(imageData);
+            renderImageList();
+            updateImageCount();
+            checkFormValidity();
+          };
+          reader.readAsDataURL(file);
+        } else {
+          showMessage('请选择PNG格式的图片', 'error');
+        }
+      });
+      
+      // 清空文件输入框，允许重复选择相同文件
+      e.target.value = '';
+    });
+    
+    // 渲染图片列表
+    function renderImageList() {
+      imageList.innerHTML = '';
+      
+      images.forEach((image, index) => {
+        const imageItem = document.createElement('div');
+        imageItem.className = 'image-item';
+        imageItem.innerHTML = `
+          <div class="image-item-header">
+            <span class="image-item-title">图片 ${index + 1}</span>
+            <button class="delete-button" data-index="${index}">删除</button>
+          </div>
+          <img src="${image.preview}" class="image-thumbnail">
+          <div class="form-group">
+            <label>组件名称: <span style="color: red;">*</span></label>
+            <input type="text" class="image-name" data-index="${index}" placeholder="请输入组件名称" value="${image.name}">
+          </div>
+          <div class="form-group">
+            <label>组件描述:</label>
+            <textarea class="image-description" data-index="${index}" placeholder="请输入组件描述">${image.description}</textarea>
+          </div>
+        `;
+        
+        imageList.appendChild(imageItem);
+      });
+      
+      // 绑定删除按钮事件
+      document.querySelectorAll('.delete-button').forEach(button => {
+        button.addEventListener('click', function() {
+          const index = parseInt(this.getAttribute('data-index'));
+          images.splice(index, 1);
+          renderImageList();
+          updateImageCount();
+          checkFormValidity();
+        });
+      });
+      
+      // 绑定输入框事件
+      document.querySelectorAll('.image-name').forEach(input => {
+        input.addEventListener('input', function() {
+          const index = parseInt(this.getAttribute('data-index'));
+          images[index].name = this.value;
+          checkFormValidity();
+        });
+      });
+      
+      document.querySelectorAll('.image-description').forEach(textarea => {
+        textarea.addEventListener('input', function() {
+          const index = parseInt(this.getAttribute('data-index'));
+          images[index].description = this.value;
+          checkFormValidity();
+        });
+      });
+    }
+    
+    // 更新图片计数
+    function updateImageCount() {
+      imageCount.textContent = `已选择: ${images.length}/${MAX_IMAGES} 张图片`;
+      
+      // 如果达到最大数量，禁用上传按钮
+      if (images.length >= MAX_IMAGES) {
+        uploadButton.disabled = true;
+        uploadButton.textContent = '已达到最大数量';
+      } else {
+        uploadButton.disabled = false;
+        uploadButton.textContent = '选择图片';
+      }
+    }
+    
+    // 检查表单有效性（只检查名称，描述为非必填）
+    function checkFormValidity() {
+      const isValid = images.length > 0 &&
+                     images.every(img => img.name.trim() !== '');
+      submitButton.disabled = !isValid;
+      
+      // 如果表单有效，显示提交按钮
+      if (isValid) {
+        submitButton.style.display = 'block';
+      }
+    }
+    
+    // 显示消息
+    function showMessage(message, type) {
+      messageContainer.innerHTML = `<div class="message ${type}">${message}</div>`;
+      
+      // 3秒后自动清除消息
+      setTimeout(() => {
+        messageContainer.innerHTML = '';
+      }, 3000);
+    }
+    
+    // 处理表单提交
+    submitButton.addEventListener('click', async function() {
+      if (images.length === 0) {
+        showMessage('请至少上传一张图片', 'error');
+        return;
+      }
+      
+      if (!images.every(img => img.name.trim() !== '')) {
+        showMessage('请为所有图片填写名称', 'error');
+        return;
+      }
+      
+      submitButton.disabled = true;
+      submitButton.textContent = '创建中...';
+      
+      try {
+        // 处理所有图片
+        const imageDataArray = [];
+        
+        for (const image of images) {
+          const arrayBuffer = await image.file.arrayBuffer();
+          const imageData = new Uint8Array(arrayBuffer);
+          
+          imageDataArray.push({
+            imageData: Array.from(imageData),
+            name: image.name.trim(),
+            description: image.description.trim()
+          });
+        }
+        
+        // 发送消息到插件主代码
+        parent.postMessage({
+          pluginMessage: {
+            type: 'create-multiple-components',
+            images: imageDataArray
+          }
+        }, '*');
+      } catch (error) {
+        showMessage('处理图片时出错: ' + error.message, 'error');
+        submitButton.disabled = false;
+        submitButton.textContent = '创建组件';
+      }
+    });
+    
+    // 监听来自插件主代码的消息
+    window.onmessage = async (event) => {
+      const message = event.data.pluginMessage;
+      
+      if (message.type === 'success') {
+        showMessage(message.message, 'success');
+        // 重置插件状态，不关闭插件
+        resetPlugin();
+      } else if (message.type === 'error') {
+        showMessage(message.message, 'error');
+        submitButton.disabled = false;
+        submitButton.textContent = '创建组件';
+      }
+    };
+    
+    // 重置插件状态
+    function resetPlugin() {
+      images = [];
+      renderImageList();
+      updateImageCount();
+      checkFormValidity();
+      messageContainer.innerHTML = '';
+      
+      // 隐藏提交按钮，只保留选择图片按钮
+      submitButton.style.display = 'none';
+    }
+  </script>
+</body>
+</html>
