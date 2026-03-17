@@ -208,11 +208,57 @@
     .add-more-button:hover {
       background-color: #e9eaec;
     }
+    
+    /* 悬浮上传按钮样式 */
+    .floating-upload {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background-color: #18a0fb;
+      color: white;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+      z-index: 1000;
+      transition: all 0.3s ease;
+    }
+    
+    .floating-upload:hover {
+      background-color: #0d8aee;
+      transform: scale(1.1);
+    }
+    
+    .floating-upload:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    .floating-upload input[type="file"] {
+      position: absolute;
+      left: 0;
+      top: 0;
+      opacity: 0;
+      width: 100%;
+      height: 100%;
+      cursor: pointer;
+    }
+    
+    .floating-upload:disabled input[type="file"] {
+      cursor: not-allowed;
+    }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>ComponentCraft <span style="font-size: 12px; color: #999;">v1.1</span></h1>
+    <h1>ComponentCraft <span style="font-size: 12px; color: #999;">v1.2</span></h1>
     
     <div class="form-group">
       <label for="image-upload">选择PNG图片 (最多5张):</label>
@@ -248,10 +294,18 @@
     
     <div id="message-container"></div>
   </div>
+  
+  <!-- 悬浮上传按钮 -->
+  <button class="floating-upload" id="floating-upload-button">
+    +
+    <input type="file" id="floating-image-upload" accept=".png" multiple>
+  </button>
 
   <script>
     const imageUpload = document.getElementById('image-upload');
     const uploadButton = document.getElementById('upload-button');
+    const floatingUploadButton = document.getElementById('floating-upload-button');
+    const floatingImageUpload = document.getElementById('floating-image-upload');
     const imageList = document.getElementById('image-list');
     const imageCount = document.getElementById('image-count');
     const submitButton = document.getElementById('submit-button');
@@ -276,7 +330,21 @@
     
     // 监听文件选择
     imageUpload.addEventListener('change', function(e) {
-      const files = Array.from(e.target.files);
+      handleFileSelection(e.target.files);
+      // 清空文件输入框，允许重复选择相同文件
+      e.target.value = '';
+    });
+    
+    // 监听悬浮上传按钮的文件选择
+    floatingImageUpload.addEventListener('change', function(e) {
+      handleFileSelection(e.target.files);
+      // 清空文件输入框，允许重复选择相同文件
+      e.target.value = '';
+    });
+    
+    // 处理文件选择的通用函数
+    function handleFileSelection(fileList) {
+      const files = Array.from(fileList);
       
       // 检查是否超过最大数量
       if (images.length + files.length > MAX_IMAGES) {
@@ -299,6 +367,7 @@
             images.push(imageData);
             renderImageList();
             updateImageCount();
+            updateFloatingUploadButtonState();
             checkFormValidity();
             
             // 如果有图片，显示前缀控件
@@ -311,10 +380,18 @@
           showMessage('请选择PNG格式的图片', 'error');
         }
       });
-      
-      // 清空文件输入框，允许重复选择相同文件
-      e.target.value = '';
-    });
+    }
+    
+    // 更新悬浮上传按钮状态
+    function updateFloatingUploadButtonState() {
+      if (images.length >= MAX_IMAGES) {
+        floatingUploadButton.disabled = true;
+        floatingImageUpload.disabled = true;
+      } else {
+        floatingUploadButton.disabled = false;
+        floatingImageUpload.disabled = false;
+      }
+    }
     
     // 渲染图片列表
     function renderImageList() {
@@ -349,6 +426,7 @@
           images.splice(index, 1);
           renderImageList();
           updateImageCount();
+          updateFloatingUploadButtonState();
           checkFormValidity();
           
           // 如果没有图片了，隐藏前缀控件
@@ -476,6 +554,7 @@
       if (message.type === 'success') {
         showMessage(message.message, 'success');
         // 重置插件状态，不关闭插件
+        submitButton.textContent = '创建组件';
         resetPlugin();
       } else if (message.type === 'error') {
         showMessage(message.message, 'error');
@@ -494,6 +573,7 @@
       images = [];
       renderImageList();
       updateImageCount();
+      updateFloatingUploadButtonState();
       checkFormValidity();
       messageContainer.innerHTML = '';
       
@@ -503,7 +583,9 @@
       prefixToggle.checked = false;
       prefixInput.value = '';
       
-      // 隐藏提交按钮，只保留选择图片按钮
+      // 重置按钮文案并隐藏提交按钮，只保留选择图片按钮
+      submitButton.textContent = '创建组件';
+      submitButton.disabled = true;
       submitButton.style.display = 'none';
     }
   </script>
