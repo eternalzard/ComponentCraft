@@ -258,7 +258,7 @@
 </head>
 <body>
   <div class="container">
-    <h1>ComponentCraft <span style="font-size: 12px; color: #999;">v1.2</span></h1>
+    <h1>ComponentCraft <span style="font-size: 12px; color: #999;">v1.2.1</span></h1>
     
     <div class="form-group">
       <label for="image-upload">选择PNG图片 (最多5张):</label>
@@ -316,6 +316,22 @@
     
     let images = [];
     const MAX_IMAGES = 5;
+
+    function getBaseName(filename) {
+      const name = (filename || '').split(/[\\/]/).pop() || '';
+      return name.replace(/\.[^.]+$/, '').trim();
+    }
+
+    function makeUniqueName(desiredName) {
+      const base = (desiredName || '').trim();
+      if (!base) return '';
+      const existing = new Set(images.map(img => (img.name || '').trim()).filter(Boolean));
+      if (!existing.has(base)) return base;
+
+      let i = 2;
+      while (existing.has(`${base}-${i}`)) i++;
+      return `${base}-${i}`;
+    }
     
     // 监听前缀开关
     prefixToggle.addEventListener('change', function() {
@@ -359,7 +375,7 @@
           reader.onload = function(event) {
             const imageData = {
               file: file,
-              name: '',
+              name: makeUniqueName(getBaseName(file.name)),
               description: '',
               preview: event.target.result
             };
@@ -476,10 +492,8 @@
                      images.every(img => img.name.trim() !== '');
       submitButton.disabled = !isValid;
       
-      // 如果表单有效，显示提交按钮
-      if (isValid) {
-        submitButton.style.display = 'block';
-      }
+      // 仅在表单有效时显示提交按钮，否则隐藏
+      submitButton.style.display = isValid ? 'block' : 'none';
     }
     
     // 显示消息
