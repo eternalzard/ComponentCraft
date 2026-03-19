@@ -77,6 +77,15 @@
     .file-input-button:hover {
       background-color: #0d8aee;
     }
+
+    .file-input-button:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
+
+    .file-input-button:disabled:hover {
+      background-color: #ccc;
+    }
     
     input[type="file"] {
       position: absolute;
@@ -86,6 +95,11 @@
       width: 100%;
       height: 100%;
       cursor: pointer;
+    }
+
+    input[type="file"]:disabled {
+      pointer-events: none;
+      cursor: not-allowed;
     }
     
     .preview-container {
@@ -258,7 +272,7 @@
 </head>
 <body>
   <div class="container">
-    <h1>ComponentCraft <span style="font-size: 12px; color: #999;">v1.2.1</span></h1>
+    <h1>ComponentCraft <span style="font-size: 12px; color: #999;">v1.2.2</span></h1>
     
     <div class="form-group">
       <label for="image-upload">选择PNG图片 (最多5张):</label>
@@ -479,9 +493,11 @@
       // 如果达到最大数量，禁用上传按钮
       if (images.length >= MAX_IMAGES) {
         uploadButton.disabled = true;
+        imageUpload.disabled = true;
         uploadButton.textContent = '已达到最大数量';
       } else {
         uploadButton.disabled = false;
+        imageUpload.disabled = false;
         uploadButton.textContent = '选择图片';
       }
     }
