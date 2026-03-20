@@ -53,6 +53,48 @@
       height: 80px;
       resize: vertical;
     }
+
+    /* 组件名称前缀开关：选中态对勾纯白 */
+    .prefix-toggle-checkbox {
+      width: 16px;
+      height: 16px;
+      margin-right: 8px;
+      appearance: none;
+      -webkit-appearance: none;
+      border: 2px solid #18a0fb;
+      border-radius: 3px;
+      background-color: #ffffff;
+      vertical-align: middle;
+      position: relative;
+      cursor: pointer;
+    }
+
+    .prefix-toggle-checkbox:checked {
+      background-color: #18a0fb;
+    }
+
+    .prefix-toggle-checkbox:checked::after {
+      content: '';
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 5px;
+      height: 9px;
+      border: solid #ffffff;
+      border-width: 0 2px 2px 0;
+      transform: translate(-50%, -50%) rotate(45deg);
+    }
+
+    .prefix-toggle-checkbox:focus {
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(24, 160, 251, 0.25);
+    }
+
+    .prefix-toggle-checkbox:disabled {
+      cursor: not-allowed;
+      border-color: #ccc;
+      background-color: #f5f5f5;
+    }
     
     .file-input-container {
       position: relative;
@@ -78,12 +120,21 @@
       background-color: #0d8aee;
     }
 
+    /* 文件 input 是透明覆盖层，鼠标 hover 可能落在 input 上导致按钮 hover 不触发 */
+    .file-input-container:hover .file-input-button {
+      background-color: #0d8aee;
+    }
+
     .file-input-button:disabled {
       background-color: #ccc;
       cursor: not-allowed;
     }
 
     .file-input-button:disabled:hover {
+      background-color: #ccc;
+    }
+
+    .file-input-container:hover .file-input-button:disabled {
       background-color: #ccc;
     }
     
@@ -272,7 +323,7 @@
 </head>
 <body>
   <div class="container">
-    <h1>ComponentCraft <span style="font-size: 12px; color: #999;">v1.2.2</span></h1>
+    <h1>ComponentCraft <span style="font-size: 12px; color: #999;">v1.2.4</span></h1>
     
     <div class="form-group">
       <label for="image-upload">选择PNG图片 (最多5张):</label>
@@ -284,7 +335,7 @@
     
     <div class="form-group" id="prefix-controls" style="display: none;">
       <label style="display: flex; align-items: center;">
-        <input type="checkbox" id="prefix-toggle" style="margin-right: 8px; accent-color: #18a0fb;">
+        <input type="checkbox" id="prefix-toggle" class="prefix-toggle-checkbox">
         启用组件名称前缀
       </label>
     </div>
