@@ -1,6 +1,6 @@
 <img width="1920" height="1080" alt="Cover" src="https://github.com/user-attachments/assets/38c07626-9462-4032-ac80-1a4870240bee" />
 
-# Figma ComponentCraft 插件 v1.2.4
+#ComponentCraft v1.2.4
 
 这是一个Figma插件，允许用户上传PNG图片，填写组件名称和描述，然后自动将图片等比裁剪为300x300px并创建为组件。
 
